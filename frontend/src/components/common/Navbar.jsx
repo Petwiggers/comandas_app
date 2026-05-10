@@ -102,9 +102,7 @@ const Navbar = () => {
                             ))}
                             <Tooltip title="Perfil" arrow>
                                 <IconButton color="inherit">
-                                    <Avatar sx={{ width: 32, height: 32, bgcolor: '#f59e0b' }}>
-                                        <AccountCircle />
-                                    </Avatar>
+                                    <Avatar alt="Remy Sharp" src="/teste.png" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Sair" arrow>
@@ -130,7 +128,6 @@ const Navbar = () => {
                                 <MenuIcon />
                             </IconButton>
                         </Box>
-
                     </Box>
                 )}
             </Toolbar>
