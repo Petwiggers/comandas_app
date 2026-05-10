@@ -3,8 +3,10 @@ import { TextField, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import PageLayout from "../components/common/PageLayout";
 import { useValidationRules } from '../hooks/useValidationRules';
+import useMasks  from '../hooks/useMasks';
 
 const ClienteForm = () => {
+    const { applyCpfMask, cleanCpf, applyPhoneMask, cleanPhone } = useMasks();
     const { control, handleSubmit, formState: { errors } } = useForm();
     const validationRules = useValidationRules();
     const navigate = useNavigate();
@@ -40,6 +42,12 @@ const ClienteForm = () => {
                             {...field} label="CPF" fullWidth margin="normal"
                             error={!!errors.cpf}
                             helperText={errors.cpf?.message}
+                            onChange={(e) => {
+                                const value = cleanCpf(e.target.value);
+                                field.onChange(value);
+                            }}
+                            value={field.value ? applyCpfMask(field.value) : ''}
+                            inputprops={{ maxLength: 14 }} 
                         />
                     )}
                 />
@@ -52,6 +60,12 @@ const ClienteForm = () => {
                             {...field} label="Telefone" fullWidth margin="normal"
                             error={!!errors.telefone}
                             helperText={errors.telefone?.message}
+                            onChange={(e) => {
+                                const value = cleanPhone(e.target.value);
+                                field.onChange(value);
+                            }}
+                            value={field.value ? applyPhoneMask(field.value) : ''}
+                            inputprops={{ maxLength: 18 }}
                         />
                     )}
                 />

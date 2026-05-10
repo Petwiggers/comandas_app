@@ -3,7 +3,12 @@ import { useAuth } from "../../context/AuthContext";
 import { TextField, Button, Box, Typography, Paper, Avatar } from "@mui/material";
 import { RestaurantMenu as MenuIcon } from '@mui/icons-material';
 import useValidationRules from "../../hooks/useValidationRules";
+import useMasks  from '../../hooks/useMasks';
+
 const LoginForm = () => {
+
+    const { applyCpfMask, cleanCpf, applyPhoneMask, cleanPhone } = useMasks();
+
     const validationRules = useValidationRules();
     // hook para gerenciar o formulário
     // useForm é usado para gerenciar o estado do formulário, como os valores dos campos e as validações.
@@ -44,15 +49,26 @@ const LoginForm = () => {
                 </Box>
                 {/* Formulário */}
                 <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+
                     <Controller
-                        name="cpf" control={control} defaultValue=""
+                        name="cpf"
+                        control={control}
                         rules={validationRules.cpf}
+                        defaultValue=""
                         render={({ field }) => (
                             <TextField
-                                {...field} fullWidth label="Usuário" margin="normal"
+                                {...field}
+                                label="CPF"
+                                fullWidth
+                                margin="normal"
                                 error={!!errors.cpf}
                                 helperText={errors.cpf?.message}
-                                sx={{ mb: 2 }}
+                                onChange={(e) => {
+                                    const value = cleanCpf(e.target.value);
+                                    field.onChange(value);
+                                }}
+                                value={field.value ? applyCpfMask(field.value) : ''}
+                                inputprops={{ maxLength: 14 }}
                             />
                         )}
                     />
@@ -71,12 +87,14 @@ const LoginForm = () => {
 
                     <Button type="submit" variant="contained" fullWidth size="large" sx={{
                         py: 1.5, background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', '&:hover': {
-                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' } }}>
-                            Entrar
+                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+                        }
+                    }}>
+                        Entrar
                     </Button>
                 </Box>
-        </Paper >
-    </Box >
+            </Paper >
+        </Box >
     );
 };
 export default LoginForm;
