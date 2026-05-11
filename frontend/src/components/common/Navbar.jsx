@@ -102,7 +102,7 @@ const Navbar = () => {
                             ))}
                             <Tooltip title="Perfil" arrow>
                                 <IconButton color="inherit">
-                                    <Avatar alt="Remy Sharp" src="/teste.png" />
+                                    <Avatar alt="Remy Sharp" src="/MinhaFoto.png" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Sair" arrow>
