@@ -3,15 +3,25 @@ import { Dashboard, People, Group, RestaurantMenu, Receipt, PointOfSale, Logout,
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import { useState } from 'react';
+import ProfilePopover from './ProfilePopover';
 const Navbar = () => {
     // useNavigate é um hook do React Router que permite programaticamente navegar entre rotas
     const navigate = useNavigate();
     // useAuth é um hook personalizado que fornece acesso ao contexto de autenticação
-    // logouut é uma função que realiza o logout do usuário
-    // isAuthenticated é um booleano que indica se o usuário está autenticado ou não
-    const { isAuthenticated, logout } = useAuth();
+    // logout é uma função que realiza o logout do usuário
+    // isAuthenticated indica se o usuário está autenticado ou não
+    const { isAuthenticated, logout, user } = useAuth();
     // Estado para controlar a abertura do drawer mobile
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+    const [profileAnchorEl, setProfileAnchorEl] = useState(null);
+
+    const handleProfileOpen = (event) => {
+        setProfileAnchorEl(event.currentTarget);
+    };
+
+    const handleProfileClose = () => {
+        setProfileAnchorEl(null);
+    };
     // Chama a função de logout do contexto de autenticação
     const handleLogout = () => {
         logout();
@@ -101,8 +111,8 @@ const Navbar = () => {
                                 </Tooltip>
                             ))}
                             <Tooltip title="Perfil" arrow>
-                                <IconButton color="inherit">
-                                    <Avatar alt="Remy Sharp" src="/MinhaFoto.png" />
+                                <IconButton color="inherit" onClick={handleProfileOpen}>
+                                    <Avatar alt={user?.nome || 'Perfil'} src="/MinhaFoto.png" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Sair" arrow>
@@ -116,7 +126,7 @@ const Navbar = () => {
                         {/* Menu Mobile - xs e abaixo */}
                         <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', gap: 1 }}>
                             <Tooltip title="Perfil" arrow>
-                                <IconButton color="inherit">
+                                <IconButton color="inherit" onClick={handleProfileOpen}>
                                     <Avatar sx={{ width: 32, height: 32, bgcolor: '#f59e0b' }}>
                                         <AccountCircle />
                                     </Avatar>
@@ -128,6 +138,12 @@ const Navbar = () => {
                                 <MenuIcon />
                             </IconButton>
                         </Box>
+                        <ProfilePopover
+                            anchorEl={profileAnchorEl}
+                            onClose={handleProfileClose}
+                            user={user}
+                            onLogout={handleLogout}
+                        />
                     </Box>
                 )}
             </Toolbar>
