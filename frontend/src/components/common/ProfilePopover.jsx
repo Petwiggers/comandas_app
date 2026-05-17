@@ -26,9 +26,9 @@ const ProfilePopover = ({ anchorEl, onClose, user, onLogout }) => {
             onClose={onClose}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            PaperProps={{ sx: { p: 2, width: 340, minWidth: 280, borderRadius: 2, boxShadow: 6, bgcolor: 'background.paper' } }}
+            PaperProps={{ sx: { p: 2, width: 340, minWidth: 300, borderRadius: 2, boxShadow: 6, bgcolor: 'background.paper'} }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, pr: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, pr: 1, pl: 1 , mt:1}}>
                 <Avatar sx={{ bgcolor: '#f59e0b', width: 56, height: 56 }} src={avatarSrc}>
                     {!avatarSrc && initials}
                 </Avatar>
@@ -48,7 +48,7 @@ const ProfilePopover = ({ anchorEl, onClose, user, onLogout }) => {
 
             <Divider sx={{ my: 1 }} />
 
-            <Stack spacing={1} sx={{ mb: 1, pr: 1, '& > div': { pr: 1, py: 0.5 } }}>
+            <Stack spacing={1} sx={{ mb: 1, pr: 1, pl: 1, '& > div': { pr: 1, py: 0.5 } }}>
                 {cpf && (
                     <Box>
                         <Typography variant="caption" color="text.secondary">
