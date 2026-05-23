@@ -45,6 +45,7 @@ const AppRoutes = () => {
                 <Route path="/funcionario/:opr/:id" element={<PrivateRoute><FuncionarioForm /></PrivateRoute>} />
                 <Route path="/clientes" element={<PrivateRoute><ClienteList /></PrivateRoute>} />
                 <Route path="/cliente" element={<PrivateRoute><ClienteForm /></PrivateRoute>} />
+                <Route path="/cliente/:opr/:id" element={<PrivateRoute><ClienteForm /></PrivateRoute>} />
                 {/* Rota para páginas não encontradas */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
