@@ -34,10 +34,8 @@ export const useMasks = () => {
     // Função para aplicar máscara de Telefone
     const applyPhoneMask = (value) => {
         if (!value) return '';
-        // Remove caracteres não numéricos
-        console.log('Valor original para telefone:', value);    
+        // Remove caracteres não numéricos   
         const numbersOnly = cleanPhone(value);
-        console.log('Número limpo para telefone:', numbersOnly);
         // Aplica máscara: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
         if (numbersOnly.length <= 2) {
             return numbersOnly;

@@ -134,6 +134,7 @@ const FuncionarioForm = () => {
                                 disabled={isReadOnly}
                                 error={!!errors.matricula}
                                 helperText={errors.matricula?.message}
+                                slotProps={{ htmlInput: { maxLength: 10 } }}
                             />
                         )}
                     />
@@ -152,7 +153,7 @@ const FuncionarioForm = () => {
                                     field.onChange(value);
                                 }}
                                 value={field.value ? applyCpfMask(field.value) : ''}
-                                slotProps={{ maxLength: 14 }}
+                                slotProps={{ htmlInput: { maxLength: 14 } }}
                             />
                         )}
                     />
@@ -171,7 +172,7 @@ const FuncionarioForm = () => {
                                     field.onChange(value);
                                 }}
                                 value={field.value ? applyPhoneMask(field.value) : ''}
-                                slotProps={{ maxLength: 18 }}
+                                slotProps={{ htmlInput: { maxLength: 18 } }}
                             />
                         )}
                     />

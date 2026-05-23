@@ -188,7 +188,7 @@ const FuncionarioFilters = ({ onFilter, onClear, filters: externalFilters = {} }
                             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
                                 Grupo
                             </Typography>
-                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                            <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }} useFlexGap>
                                 {GRUPO_OPTIONS.map(option => {
                                     const selected = (filters.grupo || []).includes(option.value);
                                     return (

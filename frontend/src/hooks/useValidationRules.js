@@ -1,8 +1,15 @@
 export const useValidationRules = () => ({
     nome: { required: 'Nome é obrigatório' },
-    cpf: { required: 'CPF é obrigatório' },
+    cpf: { 
+        required: 'CPF é obrigatório',
+        maxLength: { value: 11, message: 'CPF deve conter no máximo 11 dígitos' },
+    },
     telefone: {},
-    matricula: { required: 'Matrícula é obrigatória' },
+    matricula: { 
+        required: 'Matrícula é obrigatória',
+        pattern: { value: /^\d+$/, message: 'Matrícula deve conter apenas números' },
+        maxLength: { value: 10, message: 'Matrícula deve ter no máximo 10 caracteres' }
+    },
     senha: {
         required: 'Senha é obrigatória',
         minLength: { value: 6, message: 'Senha deve ter pelo menos 6 caracteres' }
