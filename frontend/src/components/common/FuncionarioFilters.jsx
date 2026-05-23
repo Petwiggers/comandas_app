@@ -131,7 +131,7 @@ const FuncionarioFilters = ({ onFilter, onClear, filters: externalFilters = {} }
                                 placeholder="Buscar por ID..."
                                 type="number"
                                 size="small"
-                                inputProps={{ min: 1 }}
+                                slotProps={{ min: 1 }}
                             />
                         </Box>
 

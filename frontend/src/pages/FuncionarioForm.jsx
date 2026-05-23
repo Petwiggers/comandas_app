@@ -7,8 +7,12 @@ import { useValidationRules } from '../hooks/useValidationRules';
 import useMasks from '../hooks/useMasks';
 import { funcionarioService } from '../services/funcionarioService';
 import showSnackbar from '../utils/snackbar';
+import { InputAdornment, IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const FuncionarioForm = () => {
+
+    const [showPassword, setShowPassword] = useState(false);
     const { id, opr } = useParams();
     const navigate = useNavigate();
 
@@ -148,7 +152,7 @@ const FuncionarioForm = () => {
                                     field.onChange(value);
                                 }}
                                 value={field.value ? applyCpfMask(field.value) : ''}
-                                inputProps={{ maxLength: 14 }}
+                                slotProps={{ maxLength: 14 }}
                             />
                         )}
                     />
@@ -167,7 +171,7 @@ const FuncionarioForm = () => {
                                     field.onChange(value);
                                 }}
                                 value={field.value ? applyPhoneMask(field.value) : ''}
-                                inputProps={{ maxLength: 18 }}
+                                slotProps={{ maxLength: 18 }}
                             />
                         )}
                     />
@@ -190,6 +194,32 @@ const FuncionarioForm = () => {
                             </TextField>
                         )}
                     />
+
+                    <Controller
+                        name="senha" control={control} defaultValue=""
+                        rules={validationRules.senha}
+                        render={({ field }) => (
+                            <TextField
+                                {...field} label="Senha" fullWidth margin="normal"
+                                type={showPassword ? "text" : "password"}
+                                disabled={isReadOnly}
+                                error={!!errors.senha}
+                                helperText={errors.senha?.message}
+                                slotProps={{
+                                    input: {
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton onClick={() => setShowPassword(prev => !prev)} edge="end">
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }
+                                }}
+                            />
+                        )}
+                    />
+
 
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                         <Button sx={{ mr: 1 }} onClick={handleCancel} disabled={loading}>
