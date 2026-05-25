@@ -13,7 +13,10 @@ const ClienteForm = () => {
     const navigate = useNavigate();
 
     const { applyCpfMask, cleanCpf, applyPhoneMask, cleanPhone } = useMasks();
-    const { control, handleSubmit, formState: { errors, dirtyFields }, reset } = useForm();
+    const { control, handleSubmit, formState: { errors, dirtyFields }, reset } = useForm({
+        mode: "onBlur"
+    });
+
     const validationRules = useValidationRules();
 
     const [loading, setLoading] = useState(false);

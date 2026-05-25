@@ -15,7 +15,10 @@ export const useValidationRules = () => ({
         minLength: { value: 6, message: 'Senha deve ter pelo menos 6 caracteres' }
     },
     grupo: { required: 'Grupo é obrigatório' },
-    descricao: { required: 'Descrição é obrigatória' },
+    descricao: { 
+        required: 'Descrição é obrigatória',
+        maxLength: { value: 150, message: 'Descrição deve ter no máximo 150 caracteres' }
+    },
     valor_unitario: {
         required: 'Valor unitário é obrigatório',
         min: { value: 0, message: 'Valor deve ser maior que 0' }

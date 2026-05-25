@@ -13,7 +13,10 @@ const ProdutoForm = () => {
     const { id, opr } = useParams(); // Parâmetros da URL: id e operação (edit/view)
     const navigate = useNavigate(); // Navegação entre páginas
     // Hook de formulário
-    const { control, handleSubmit, formState: { errors, dirtyFields }, reset } = useForm();
+    const { control, handleSubmit, formState: { errors, dirtyFields }, reset } = useForm({
+        mode: "onBlur"
+    });
+    
     // Estados do componente
     const [foto, setFoto] = useState(null); // Arquivo de foto selecionado
     const [fotoPreview, setFotoPreview] = useState(null); // URL para preview da foto
