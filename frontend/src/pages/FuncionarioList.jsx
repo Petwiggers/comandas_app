@@ -10,6 +10,8 @@ import { funcionarioService } from '../services/funcionarioService';
 import showSnackbar from '../utils/snackbar';
 import showConfirm from '../utils/confirm';
 
+import { useMasks } from '../hooks/useMasks';
+
 // Mapeamento de grupo: número -> nome e cor
 const GRUPO_MAP = {
     1: { label: 'Admin',  color: 'error'   },
@@ -24,6 +26,7 @@ const renderGrupoChip = (grupo) => {
 };
 
 function FuncionarioList() {
+    const { applyCpfMask, applyPhoneMask } = useMasks();
     const navigate = useNavigate();
 
     const [funcionarios, setFuncionarios] = useState([]);
@@ -121,9 +124,9 @@ function FuncionarioList() {
             <TableCell>{funcionario.id}</TableCell>
             <TableCell sx={{ fontWeight: 500 }}>{funcionario.nome}</TableCell>
             <TableCell>{funcionario.matricula || '—'}</TableCell>
-            <TableCell>{funcionario.cpf || '—'}</TableCell>
+            <TableCell>{applyCpfMask(funcionario.cpf || '—')}</TableCell>
             <TableCell>{renderGrupoChip(funcionario.grupo)}</TableCell>
-            <TableCell>{funcionario.telefone || '—'}</TableCell>
+            <TableCell>{applyPhoneMask(funcionario.telefone || '—')}</TableCell>
             <TableCell>
                 <ActionButtons
                     onView={handleView}
@@ -161,13 +164,13 @@ function FuncionarioList() {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography variant="body2" color="text.secondary">CPF:</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {funcionario.cpf || '—'}
+                            {applyCpfMask(funcionario.cpf || '—')}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography variant="body2" color="text.secondary">Telefone:</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {funcionario.telefone || '—'}
+                            {applyPhoneMask(funcionario.telefone || '—')}
                         </Typography>
                     </Box>
                 </Box>

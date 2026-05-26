@@ -9,6 +9,7 @@ import { funcionarioService } from '../services/funcionarioService';
 import showSnackbar from '../utils/snackbar';
 import { InputAdornment, IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import UniqueValidator, { useFieldValidation } from '../components/common/UniqueValidator';
 
 const FuncionarioForm = () => {
 
@@ -41,6 +42,23 @@ const FuncionarioForm = () => {
     ];
 
     const handleCancel = () => navigate('/funcionarios');
+
+    const { dialog: cpfDialog, validateField: validateCpf, closeDialog, clearField } = useFieldValidation(funcionarioService, id, 'checkCpfExists');
+    // Funções do diálogo de CPF existente
+    const handleDialogCancel = () => {
+        closeDialog();
+        clearField();
+        // Limpa o campo CPF
+        reset(prev => ({ ...prev, cpf: '' }));
+    };
+    const handleDialogView = (funcionario) => {
+        closeDialog();
+        navigate(`/funcionario/view/${funcionario.id}`);
+    };
+    const handleDialogEdit = (funcionario) => {
+        closeDialog();
+        navigate(`/funcionario/edit/${funcionario.id}`);
+    };
 
     // Carrega dados para edição/visualização
     useEffect(() => {
@@ -156,6 +174,11 @@ const FuncionarioForm = () => {
                                     const value = cleanCpf(e.target.value);
                                     field.onChange(value);
                                 }}
+                                onBlur={() => {
+                                    if (!isReadOnly) {
+                                        validateCpf(field.value);
+                                    }
+                                }}
                                 value={field.value ? applyCpfMask(field.value) : ''}
                                 slotProps={{ htmlInput: { maxLength: 14 } }}
                             />
@@ -238,6 +261,8 @@ const FuncionarioForm = () => {
                     </Box>
                 </Box>
             )}
+
+            <UniqueValidator open={cpfDialog.open} onClose={handleDialogCancel} existingRecord={cpfDialog.record}recordType="funcionário" onView={handleDialogView} onEdit={handleDialogEdit} />
         </PageLayout>
     );
 };

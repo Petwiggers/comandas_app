@@ -7,6 +7,8 @@ import PageLayout from "../components/common/PageLayout";
 import { useValidationRules } from '../hooks/useValidationRules';
 import { produtoService } from '../services/produtoService';
 import showSnackbar from '../utils/snackbar';
+import UniqueValidator, { useFieldValidation } from '../components/common/UniqueValidator';
+
 // Definição do componente ProdutoForm
 const ProdutoForm = () => {
     // Hooks de navegação e parâmetros
@@ -17,6 +19,8 @@ const ProdutoForm = () => {
         mode: "onBlur"
     });
     
+    // Hooks de validação nome 
+    const { dialog: nomeDialog, validateField: validateNome, closeDialog, clearField } = useFieldValidation(produtoService, id, 'checkNomeExists');
     // Estados do componente
     const [foto, setFoto] = useState(null); // Arquivo de foto selecionado
     const [fotoPreview, setFotoPreview] = useState(null); // URL para preview da foto

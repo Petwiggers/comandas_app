@@ -57,5 +57,18 @@ export const produtoService = {
         const response = await api.get(`${PRODUTO.PUBLIC}?${queryParams.toString()}`);
         return response.data;
     },
+
+        // Verificar se nome já existe
+    checkNomeExists: async (nome, excludeId = null) => {
+        const params = { nome };
+        if (excludeId) {
+            params.exclude_id = excludeId;
+        }
+        const response = await api.get(`${PRODUTO.LIST}?${new URLSearchParams(params).toString()}`);
+        console.log(response);
+        
+        const produtos = response.data || response;
+        return produtos.length > 0 ? produtos[0] : null;
+    },
 };
 export default produtoService;

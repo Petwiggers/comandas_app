@@ -9,9 +9,13 @@ import Pagination from '../components/common/Pagination';
 import { clienteService } from '../services/clienteService';
 import showSnackbar from '../utils/snackbar';
 import showConfirm from '../utils/confirm';
+import { useMasks } from '../hooks/useMasks';
+
+
 
 function ClienteList() {
     const navigate = useNavigate();
+    const { applyCpfMask, applyPhoneMask } = useMasks();
 
     const [clientes, setClientes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -97,8 +101,8 @@ function ClienteList() {
         <TableRow key={cliente.id} hover>
             <TableCell>{cliente.id}</TableCell>
             <TableCell sx={{ fontWeight: 500 }}>{cliente.nome}</TableCell>
-            <TableCell>{cliente.cpf}</TableCell>
-            <TableCell>{cliente.telefone}</TableCell>
+            <TableCell>{applyCpfMask(cliente.cpf || '—')}</TableCell>
+            <TableCell>{applyPhoneMask(cliente.telefone || '—')}</TableCell>
             <TableCell>
                 <ActionButtons onView={handleView} onEdit={handleEdit} onDelete={handleDelete} item={cliente} />
             </TableCell>
@@ -123,11 +127,11 @@ function ClienteList() {
                 <Box sx={{ mb: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                         <Typography variant="body2" color="text.secondary">CPF:</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{cliente.cpf}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{applyCpfMask(cliente.cpf || '—')}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="body2" color="text.secondary">Telefone:</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{cliente.telefone}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{applyPhoneMask(cliente.telefone || '—')}</Typography>
                     </Box>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
