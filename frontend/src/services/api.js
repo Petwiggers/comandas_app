@@ -75,8 +75,16 @@ api.interceptors.response.use(
                 return Promise.reject(refreshError);
             }
         } else {
-            // Códigos de erro da API, diferente de 401: 400, 403, 404, 500 - // Capturar mensagem de erro da API (detail)
-            const errorMessage = error.response?.data?.detail || error.message || 'Erro desconhecido';
+            // Códigos de erro da API, diferente de 401: 400, 403, 404, 500
+            const errorDetail = error.response?.data?.detail;
+            let errorMessage = 'Erro desconhecido';
+            if (typeof errorDetail === 'string') {
+                errorMessage = errorDetail;
+            } else if (typeof errorDetail === 'object' && errorDetail !== null) {
+                errorMessage = JSON.stringify(errorDetail);
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
             //console.log("Erro da API:", errorMessage); //console.log("Status:", error.response?.status); //console.log("Data:", error.response?.data);
             // Adicionar a mensagem de erro ao objeto error para uso posterior
             error.apiMessage = errorMessage;

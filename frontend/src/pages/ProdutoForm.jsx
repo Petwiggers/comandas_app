@@ -9,6 +9,9 @@ import { produtoService } from '../services/produtoService';
 import showSnackbar from '../utils/snackbar';
 import UniqueValidator, { useFieldValidation } from '../components/common/UniqueValidator';
 
+// TODO: Ajustar validação de Nome duplicado
+
+
 // Definição do componente ProdutoForm
 const ProdutoForm = () => {
     // Hooks de navegação e parâmetros

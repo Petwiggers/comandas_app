@@ -10,10 +10,15 @@
 * - Comunicação via eventos customizados
 */
 const showSnackbar = (message, severity = 'error') => {
-// Emite evento customizado para o SnackbarGlobal
-const event = new CustomEvent('showSnackbar', {
-detail: { message, severity }
-});
-window.dispatchEvent(event);
+    const text = typeof message === 'string'
+        ? message
+        : (message === undefined || message === null)
+            ? ''
+            : (typeof message === 'object' ? JSON.stringify(message) : String(message));
+    // Emite evento customizado para o SnackbarGlobal
+    const event = new CustomEvent('showSnackbar', {
+        detail: { message: text, severity }
+    });
+    window.dispatchEvent(event);
 };
 export default showSnackbar;
