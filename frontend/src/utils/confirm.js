@@ -10,10 +10,22 @@
 * - Callback para ação de confirmação
 */
 const showConfirm = (title, message, onConfirm) => {
-// Emite evento customizado para o ConfirmDialog
-const event = new CustomEvent('showConfirm', {
-detail: { title, message, onConfirm }
-});
-window.dispatchEvent(event);
+    return new Promise((resolve) => {
+        const handleConfirm = () => {
+            if (typeof onConfirm === 'function') {
+                onConfirm();
+            }
+            resolve(true);
+        };
+
+        const handleCancel = () => {
+            resolve(false);
+        };
+
+        const event = new CustomEvent('showConfirm', {
+            detail: { title, message, onConfirm: handleConfirm, onCancel: handleCancel }
+        });
+        window.dispatchEvent(event);
+    });
 };
 export default showConfirm;

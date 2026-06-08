@@ -44,7 +44,7 @@ const API_ENDPOINTS = {
     RECEBIMENTO: {
         DASHBOARD: '/recebimento/dashboard', // GET - dashboard comandas abertas
         DETALHE: '/recebimento/comandas/detalhe/:ids', // GET - detalhar comandas
-        RECEBER: '/recebimento/completo', // POST - processar recebimento
+        RECEBER: '/recebimento/complete', // POST - processar recebimento
         COMPROVANTE: '/recebimento/comprovante/:id', // GET - gerar comprovante
     },
     AUDITORIA: {

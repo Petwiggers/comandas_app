@@ -2,7 +2,7 @@ import { Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions, But
 import { useState, useEffect } from 'react';
 const SnackbarGlobal = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'error' });
-    const [dialog, setDialog] = useState({ open: false, title: '', message: '', onConfirm: null });
+    const [dialog, setDialog] = useState({ open: false, title: '', message: '', onConfirm: null, onCancel: null });
     useEffect(() => {
         // Listener para eventos de notificação
         const handleShowSnackbar = (event) => {
@@ -11,8 +11,8 @@ const SnackbarGlobal = () => {
         };
         // Listener para eventos de confirmação
         const handleShowConfirm = (event) => {
-            const { title, message, onConfirm } = event.detail;
-            setDialog({ open: true, title, message, onConfirm });
+            const { title, message, onConfirm, onCancel } = event.detail;
+            setDialog({ open: true, title, message, onConfirm, onCancel });
         };
         window.addEventListener('showSnackbar', handleShowSnackbar);
         window.addEventListener('showConfirm', handleShowConfirm);
@@ -32,7 +32,12 @@ const SnackbarGlobal = () => {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-            <Dialog open={dialog.open} onClose={() => setDialog({ ...dialog, open: false })} maxWidth="sm" fullWidth>
+            <Dialog open={dialog.open} onClose={() => {
+                        if (dialog.onCancel) {
+                            dialog.onCancel();
+                        }
+                        setDialog({ ...dialog, open: false });
+                    }} maxWidth="sm" fullWidth>
                 <DialogTitle sx={{ color: 'error.main' }}>
                     {dialog.title}
                 </DialogTitle>
@@ -42,7 +47,12 @@ const SnackbarGlobal = () => {
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDialog({ ...dialog, open: false })} color="inherit">
+                    <Button onClick={() => {
+                        if (dialog.onCancel) {
+                            dialog.onCancel();
+                        }
+                        setDialog({ ...dialog, open: false });
+                    }} color="inherit">
                         Cancelar
                     </Button>
                     <Button onClick={() => {

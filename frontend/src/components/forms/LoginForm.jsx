@@ -68,7 +68,7 @@ const LoginForm = () => {
                                     field.onChange(value);
                                 }}
                                 value={field.value ? applyCpfMask(field.value) : ''}
-                                inputprops={{ maxLength: 14 }}
+                                inputProps={{ maxLength: 14 }}
                             />
                         )}
                     />

@@ -120,18 +120,25 @@ function CaixaPage() {
             'Confirmar Pagamento',
             `Deseja confirmar o pagamento de ${selectedIds.length} comanda(s)?`
         );
+        console.log(confirmado);
+        
 
         if (!confirmado) return;
 
         try {
             setProcessandoPagamento(true);
 
-            const desconto_valor = desconto > 0 ? desconto : null;
-            const acrescimo_valor = acrescimo > 0 ? acrescimo : null;
+            const desconto_valor = desconto ? Number(desconto) : null;
+            const acrescimo_valor = acrescimo ? Number(acrescimo) : null;
+
+            const primeiroClienteId = detalhesComandas?.comandas?.[0]?.cliente_id ?? null;
+            const mesmoCliente = detalhesComandas?.comandas?.every(
+                (comanda) => comanda.cliente_id === primeiroClienteId
+            );
 
             const recebimentoData = {
                 funcionario_id: user.id,
-                cliente_id: null,
+                cliente_id: mesmoCliente ? primeiroClienteId : null,
                 comandas_ids: selectedIds,
                 desconto_valor,
                 acrescimo_valor,
@@ -139,7 +146,11 @@ function CaixaPage() {
 
             const response = await recebimentoService.postComplete(recebimentoData);
 
-            showSnackbar('Pagamento realizado com sucesso!', 'success');
+            if (!response?.sucesso) {
+                throw new Error(response?.mensagem || 'Erro ao confirmar pagamento');
+            }
+
+            showSnackbar(response.mensagem || 'Pagamento realizado com sucesso!', 'success');
 
             // Limpar seleção e recarregar dashboard
             setSelectedIds([]);
@@ -147,7 +158,7 @@ function CaixaPage() {
             setAcrescimo(0);
             await carregarDashboard();
         } catch (error) {
-            showSnackbar('Erro ao processar pagamento', 'error');
+            showSnackbar(error?.message || 'Erro ao processar pagamento', 'error');
             console.error(error);
         } finally {
             setProcessandoPagamento(false);
@@ -163,9 +174,9 @@ function CaixaPage() {
 
     return (
         <PageLayout title="Caixa - Fechamento de Comandas">
-            <Grid container spacing={3} sx={{ height: '100%' }}>
+            <Grid container spacing={3} sx={{ alignItems: 'flex-start' }}>
                 {/* PAINEL ESQUERDO - Lista de Comandas */}
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} md={6} lg={7}>
                     <Card>
                         <CardContent>
                             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
@@ -242,7 +253,7 @@ function CaixaPage() {
                 </Grid>
 
                 {/* PAINEL DIREITO - Detalhes e Pagamento */}
-                <Grid item xs={12} sm={6}>
+                <Grid xs={12} md={6} lg={5}>
                     <Card>
                         <CardContent>
                             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
@@ -261,49 +272,51 @@ function CaixaPage() {
                                 <>
                                     {/* Lista de Comandas Selecionadas */}
                                     {detalhesComandas.comandas?.map(comanda => (
-                                        <Box key={comanda.id} sx={{ mb: 2 }} xs={12} sm={6}>
+                                        <Box key={comanda.id} sx={{ mb: 3 }}>
                                             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                                                 Comanda #{comanda.comanda}
                                             </Typography>
-                                            <Table size="small">
-                                                <TableHead>
-                                                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                                        <TableCell>Produto</TableCell>
-                                                        <TableCell align="center">Qtd</TableCell>
-                                                        <TableCell align="right">Unit</TableCell>
-                                                        <TableCell align="right">Total</TableCell>
-                                                    </TableRow>
-                                                </TableHead>
-                                                <TableBody>
-                                                    {comanda.itens?.map(item => (
-                                                        <TableRow key={item.id}>
-                                                            <TableCell sx={{ fontSize: '0.85rem' }}>
-                                                                {item.produto}
-                                                            </TableCell>
-                                                            <TableCell align="center" sx={{ fontSize: '0.85rem' }}>
-                                                                {item.quantidade}
-                                                            </TableCell>
-                                                            <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
-                                                                R$ {item.valor_unitario?.toFixed(2)}
-                                                            </TableCell>
-                                                            <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
-                                                                R$ {item.total_item?.toFixed(2)}
-                                                            </TableCell>
+                                            <TableContainer component={Paper} variant="outlined">
+                                                <Table size="small">
+                                                    <TableHead>
+                                                        <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                                            <TableCell>Produto</TableCell>
+                                                            <TableCell align="center">Qtd</TableCell>
+                                                            <TableCell align="right">Unit</TableCell>
+                                                            <TableCell align="right">Total</TableCell>
                                                         </TableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {comanda.itens?.map(item => (
+                                                            <TableRow key={item.id}>
+                                                                <TableCell sx={{ fontSize: '0.85rem' }}>
+                                                                    {item.produto}
+                                                                </TableCell>
+                                                                <TableCell align="center" sx={{ fontSize: '0.85rem' }}>
+                                                                    {item.quantidade}
+                                                                </TableCell>
+                                                                <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                                                                    R$ {item.valor_unitario?.toFixed(2)}
+                                                                </TableCell>
+                                                                <TableCell align="right" sx={{ fontSize: '0.85rem' }}>
+                                                                    R$ {item.total_item?.toFixed(2)}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
                                             <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
                                                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                                     Subtotal: R$ {comanda.subtotal?.toFixed(2)}
                                                 </Typography>
                                             </Box>
-                                            <Divider sx={{ my: 1 }} />
+                                            <Divider sx={{ mt: 2 }} />
                                         </Box>
                                     ))}
 
                                     {/* Resumo de Valores */}
-                                    <Box sx={{ mt: 3, p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
+                                    <Box sx={{ mt: 1, p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
                                         <Typography variant="body2" sx={{ mb: 1 }}>
                                             <strong>Subtotal Geral:</strong> R${' '}
                                             {detalhesComandas.total_geral?.toFixed(2) || '0.00'}
