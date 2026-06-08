@@ -19,6 +19,7 @@ const NotFound = lazy(() => import("../pages/NotFound"));
 const ComandaList = lazy(() => import("../pages/ComandaList"));
 const ComandaForm = lazy(() => import("../pages/ComandaForm"));
 const ComandaConsumoForm = lazy(() => import("../pages/ComandaConsumoForm"));
+const CaixaPage = lazy(() => import("../pages/CaixaPage"));
 
 // Loader para o Suspense - melhora a experiência do usuário em aplicações maiores.
 // Sempre que uma rota for acessada, o Suspense exibirá o fallback (Carregando...) até que o componente da rota seja carregado.
@@ -54,6 +55,7 @@ const AppRoutes = () => {
                 <Route path="/comanda" element={<PrivateRoute><ComandaForm /></PrivateRoute>} />
                 <Route path="/comanda/:opr/:id" element={<PrivateRoute><ComandaForm /></PrivateRoute>} />
                 <Route path="/comanda/consumo/:id" element={<PrivateRoute><ComandaConsumoForm /></PrivateRoute>} />
+                <Route path="/caixa" element={<PrivateRoute><CaixaPage /></PrivateRoute>} />
                 {/* Rota para páginas não encontradas */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
