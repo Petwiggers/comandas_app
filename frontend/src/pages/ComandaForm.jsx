@@ -128,7 +128,7 @@ const ComandaForm = () => {
 
     // Função de salvamento
     const onSubmit = async (data) => {
-        setLoading(true);
+        setLoading(true);     
         try {
             // Definir status padrão como aberta (0)
             const comandaData = {
@@ -138,6 +138,7 @@ const ComandaForm = () => {
                 funcionario_id: id && id !== 'new' ? data.funcionario_id : user?.id || '', // Usar usuário logado para novas comandas
                 status: 0 // Status: aberta
             };
+            
             let savedComanda;
             if (id && id !== 'new') {
                 // Atualizar comanda existente
@@ -262,7 +263,7 @@ const ComandaForm = () => {
                                         setSelectedCliente(null);
                                     }
                                 }}
-                                value={clienteOptions.find(o => String(o.id) === String(field.value)) || selectedCliente || null}
+                                value={clienteOptions.find(o => String(o.id) === String(field.value)) || null}
                                 onChange={(_, selected) => {
                                     const id = selected ? selected.id : '';
                                     field.onChange(id);

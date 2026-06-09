@@ -45,6 +45,7 @@ const comandaService = {
     },
     // Atualizar comanda existente
     update: async (id, comandaData) => {
+        console.log(`Atualizando comanda ID: ${id} com dados:`, comandaData);
         const response = await api.put(COMANDA.UPDATE.replace(':id', id), comandaData);
         return response.data;
     },

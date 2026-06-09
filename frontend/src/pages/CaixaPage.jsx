@@ -17,6 +17,7 @@ import {
     CircularProgress,
     Grid,
     TextField,
+    MenuItem,
 } from '@mui/material';
 import { Payment } from '@mui/icons-material';
 import PageLayout from '../components/common/PageLayout';
@@ -24,9 +25,11 @@ import { recebimentoService } from '../services/recebimentoService';
 import { useAuth } from '../context/AuthContext';
 import showSnackbar from '../utils/snackbar';
 import showConfirm from '../utils/confirm';
+import { useMasks } from '../hooks/useMasks';
 
 function CaixaPage() {
     const { user } = useAuth();
+    const { applyCpfMask, applyPhoneMask } = useMasks();
 
     // Estado para lista de comandas abertas
     const [comandasAbertas, setConandasAbertas] = useState([]);
@@ -38,6 +41,8 @@ function CaixaPage() {
     // Estado para detalhes das comandas selecionadas
     const [detalhesComandas, setDetalhesComandas] = useState(null);
     const [loadingDetalhes, setLoadingDetalhes] = useState(false);
+    const [clientesDisponiveis, setClientesDisponiveis] = useState([]);
+    const [selectedClienteId, setSelectedClienteId] = useState(null);
 
     // Estado para aplicar desconto/acréscimo
     const [desconto, setDesconto] = useState(0);
@@ -55,6 +60,8 @@ function CaixaPage() {
             buscarDetalhesComandas();
         } else {
             setDetalhesComandas(null);
+            setClientesDisponiveis([]);
+            setSelectedClienteId(null);
         }
     }, [selectedIds]);
 
@@ -81,6 +88,19 @@ function CaixaPage() {
             setLoadingDetalhes(true);
             const response = await recebimentoService.getComandasDetalhe(selectedIds);
             setDetalhesComandas(response);
+
+            const clientes = Array.isArray(response?.clientes)
+                ? response.clientes.filter(Boolean)
+                : [];
+            const clientesUnicos = clientes.reduce((acc, cliente) => {
+                if (!acc.some(item => item.id === cliente.id)) {
+                    acc.push(cliente);
+                }
+                return acc;
+            }, []);
+
+            setClientesDisponiveis(clientesUnicos);
+            setSelectedClienteId(clientesUnicos.length > 0 ? clientesUnicos[0].id : null);
         } catch (error) {
             showSnackbar('Erro ao carregar detalhes das comandas', 'error');
             console.error(error);
@@ -120,8 +140,6 @@ function CaixaPage() {
             'Confirmar Pagamento',
             `Deseja confirmar o pagamento de ${selectedIds.length} comanda(s)?`
         );
-        console.log(confirmado);
-        
 
         if (!confirmado) return;
 
@@ -131,14 +149,9 @@ function CaixaPage() {
             const desconto_valor = desconto ? Number(desconto) : null;
             const acrescimo_valor = acrescimo ? Number(acrescimo) : null;
 
-            const primeiroClienteId = detalhesComandas?.comandas?.[0]?.cliente_id ?? null;
-            const mesmoCliente = detalhesComandas?.comandas?.every(
-                (comanda) => comanda.cliente_id === primeiroClienteId
-            );
-
             const recebimentoData = {
                 funcionario_id: user.id,
-                cliente_id: mesmoCliente ? primeiroClienteId : null,
+                cliente_id: selectedClienteId ?? null,
                 comandas_ids: selectedIds,
                 desconto_valor,
                 acrescimo_valor,
@@ -174,10 +187,10 @@ function CaixaPage() {
 
     return (
         <PageLayout title="Caixa - Fechamento de Comandas">
-            <Grid container spacing={3} sx={{ alignItems: 'flex-start' }}>
-                {/* PAINEL ESQUERDO - Lista de Comandas */}
-                <Grid xs={12} md={6} lg={7}>
-                    <Card>
+            <Grid container direction="column" spacing={3} sx={{ alignItems: 'center', justifyContent: 'center' }}>
+                {/* PAINEL DE LISTA DE COMANDAS */}
+                <Grid item xs={12} md={10} lg={8} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <Card sx={{ width: '100%' }}>
                         <CardContent>
                             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
                                 Comandas Abertas ({comandasAbertas.length})
@@ -252,9 +265,9 @@ function CaixaPage() {
                     </Card>
                 </Grid>
 
-                {/* PAINEL DIREITO - Detalhes e Pagamento */}
-                <Grid xs={12} md={6} lg={5}>
-                    <Card>
+                {/* PAINEL DE DETALHES E PAGAMENTO */}
+                <Grid item xs={12} md={10} lg={8} sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <Card sx={{ width: '100%' }}>
                         <CardContent>
                             <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
                                 Detalhes do Recebimento
@@ -314,6 +327,33 @@ function CaixaPage() {
                                             <Divider sx={{ mt: 2 }} />
                                         </Box>
                                     ))}
+
+                                    {clientesDisponiveis.length > 0 ? (
+                                        <TextField
+                                            select
+                                            label="Cliente (opcional)"
+                                            fullWidth
+                                            size="small"
+                                            value={selectedClienteId ?? ''}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setSelectedClienteId(value === '' ? null : Number(value));
+                                            }}
+                                            helperText="Selecione o cliente que será usado no recebimento ou deixe vazio para nenhum cliente"
+                                            sx={{ mb: 2 }}
+                                        >
+                                            <MenuItem value="">Nenhum cliente</MenuItem>
+                                            {clientesDisponiveis.map((cliente) => (
+                                                <MenuItem key={cliente.id} value={cliente.id}>
+                                                    {cliente.nome} {cliente.cpf ? `(${applyCpfMask(cliente.cpf || '—')})` : ''}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    ) : (
+                                        <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                                            Nenhum cliente vinculado a essas comandas.
+                                        </Typography>
+                                    )}
 
                                     {/* Resumo de Valores */}
                                     <Box sx={{ mt: 1, p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
