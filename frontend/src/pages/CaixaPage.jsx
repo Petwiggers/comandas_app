@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Card,
@@ -18,8 +18,13 @@ import {
     Grid,
     TextField,
     MenuItem,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
 } from '@mui/material';
-import { Payment } from '@mui/icons-material';
+import { Payment, Print, Close } from '@mui/icons-material';
 import PageLayout from '../components/common/PageLayout';
 import { recebimentoService } from '../services/recebimentoService';
 import { useAuth } from '../context/AuthContext';
@@ -48,6 +53,11 @@ function CaixaPage() {
     const [desconto, setDesconto] = useState(0);
     const [acrescimo, setAcrescimo] = useState(0);
     const [processandoPagamento, setProcessandoPagamento] = useState(false);
+
+    // Estado do comprovante
+    const [comprovanteAberto, setComprovanteAberto] = useState(false);
+    const [comprovanteData, setComprovanteData] = useState(null);
+    const comprovanteRef = useRef(null);
 
     // Carregar dashboard ao montar
     useEffect(() => {
@@ -165,17 +175,60 @@ function CaixaPage() {
 
             showSnackbar(response.mensagem || 'Pagamento realizado com sucesso!', 'success');
 
+            const recebimentoId = response.recebimento_id;
+
             // Limpar seleção e recarregar dashboard
             setSelectedIds([]);
             setDesconto(0);
             setAcrescimo(0);
             await carregarDashboard();
+
+            const querComprovante = await showConfirm(
+                'Emitir Comprovante',
+                'Deseja emitir o comprovante de pagamento?'
+            );
+            if (querComprovante) {
+                await emitirComprovante(recebimentoId);
+            }
         } catch (error) {
             showSnackbar(error?.message || 'Erro ao processar pagamento', 'error');
             console.error(error);
         } finally {
             setProcessandoPagamento(false);
         }
+    };
+
+    const emitirComprovante = async (recebimentoId) => {
+        try {
+            const data = await recebimentoService.getComprovante(recebimentoId);
+            setComprovanteData(data);
+            setComprovanteAberto(true);
+        } catch (error) {
+            showSnackbar('Erro ao carregar comprovante', 'error');
+            console.error(error);
+        }
+    };
+
+    const handleImprimir = () => {
+        const conteudo = comprovanteRef.current?.innerHTML;
+        if (!conteudo) return;
+        const janela = window.open('', '_blank', 'width=400,height=700');
+        janela.document.write(`
+            <html><head><title>Comprovante</title>
+            <style>
+                body { font-family: monospace; font-size: 13px; padding: 16px; color: #000; background-color: #fdf8e1; }
+                h2, h3 { text-align: center; margin: 4px 0; }
+                hr { border: 1px dashed #000; margin: 8px 0; }
+                .linha { display: flex; justify-content: space-between; margin: 2px 0; }
+                .negrito { font-weight: bold; }
+                .centro { text-align: center; }
+            </style>
+            </head><body>${conteudo}</body></html>
+        `);
+        janela.document.close();
+        janela.focus();
+        janela.print();
+        janela.close();
     };
 
     // Calcular valor total com desconto e acréscimo
@@ -412,6 +465,134 @@ function CaixaPage() {
                     </Card>
                 </Grid>
             </Grid>
+            {/* DIALOG DE COMPROVANTE */}
+            <Dialog
+                open={comprovanteAberto}
+                onClose={() => setComprovanteAberto(false)}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    Comprovante de Pagamento
+                    <IconButton onClick={() => setComprovanteAberto(false)} size="small">
+                        <Close />
+                    </IconButton>
+                </DialogTitle>
+
+                <DialogContent dividers>
+                    {comprovanteData ? (
+                        <Box ref={comprovanteRef} sx={{ fontFamily: 'monospace', fontSize: '0.85rem', backgroundColor: '#fdf8e1', p: 2, borderRadius: 1 }}>
+                            {/* Cabeçalho */}
+                            {comprovanteData.cabecalho && (
+                                <Box sx={{ textAlign: 'center', mb: 1 }}>
+                                    {Object.values(comprovanteData.cabecalho).map((valor, i) => (
+                                        <Typography key={i} variant="body2" sx={{ fontFamily: 'monospace', fontWeight: i === 0 ? 'bold' : 'normal' }}>
+                                            {valor}
+                                        </Typography>
+                                    ))}
+                                </Box>
+                            )}
+
+                            <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
+
+                            {/* Info do recebimento */}
+                            {comprovanteData.recebimento && (
+                                <Box sx={{ mb: 1 }}>
+                                    {Object.entries(comprovanteData.recebimento).map(([chave, valor]) => (
+                                        <Box key={chave} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', textTransform: 'capitalize' }}>
+                                                {chave.replace(/_/g, ' ')}:
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                                {String(valor)}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            )}
+
+                            {/* Funcionário */}
+                            {comprovanteData.funcionario && (
+                                <Typography variant="body2" sx={{ fontFamily: 'monospace', mb: 1 }}>
+                                    Atendente: {comprovanteData.funcionario.nome}
+                                </Typography>
+                            )}
+
+                            {/* Cliente */}
+                            {comprovanteData.cliente && (
+                                <Typography variant="body2" sx={{ fontFamily: 'monospace', mb: 1 }}>
+                                    Cliente: {comprovanteData.cliente.nome}
+                                </Typography>
+                            )}
+
+                            <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
+
+                            {/* Comandas */}
+                            {comprovanteData.comandas?.map((comanda, i) => (
+                                <Box key={i} sx={{ mb: 1 }}>
+                                    <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'bold' }}>
+                                        Comanda #{comanda.comanda ?? comanda.id}
+                                    </Typography>
+                                </Box>
+                            ))}
+
+                            <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
+
+                            {/* Resumo de valores */}
+                            {comprovanteData.resumo_valores && (
+                                <Box sx={{ mb: 1 }}>
+                                    {Object.entries(comprovanteData.resumo_valores).map(([chave, valor]) => (
+                                        <Box key={chave} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', textTransform: 'capitalize' }}>
+                                                {chave.replace(/_/g, ' ')}:
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: chave.toLowerCase().includes('total') || chave.toLowerCase().includes('final') ? 'bold' : 'normal' }}>
+                                                {String(valor)}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            )}
+
+                            <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
+
+                            {/* Data de emissão */}
+                            {comprovanteData.data_emissao && (
+                                <Typography variant="body2" sx={{ fontFamily: 'monospace', textAlign: 'center', mb: 1 }}>
+                                    Emitido em: {new Date(comprovanteData.data_emissao).toLocaleString('pt-BR')}
+                                </Typography>
+                            )}
+
+                            {/* Rodapé */}
+                            {comprovanteData.rodape && (
+                                <Box sx={{ textAlign: 'center', mt: 1 }}>
+                                    {Object.values(comprovanteData.rodape).map((valor, i) => (
+                                        <Typography key={i} variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                            {valor}
+                                        </Typography>
+                                    ))}
+                                </Box>
+                            )}
+                        </Box>
+                    ) : (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                            <CircularProgress />
+                        </Box>
+                    )}
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => setComprovanteAberto(false)}>Fechar</Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<Print />}
+                        onClick={handleImprimir}
+                        disabled={!comprovanteData}
+                    >
+                        Imprimir
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </PageLayout>
     );
 }
