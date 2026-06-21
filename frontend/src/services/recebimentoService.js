@@ -39,6 +39,28 @@ export const recebimentoService = {
         const response = await api.get(endpoint);
         return response.data;
     },
+
+    // Listar recebimentos realizados
+    list: async (params = {}) => {
+        const { skip = 0, limit = 100 } = params;
+        const queryParams = new URLSearchParams();
+        queryParams.append('skip', skip);
+        queryParams.append('limit', limit);
+        const response = await api.get(`${RECEBIMENTO.LIST}?${queryParams.toString()}`);
+        return response.data;
+    },
+
+    // Editar desconto, acréscimo e cliente de um recebimento (somente grupo 1)
+    update: async (id, data) => {
+        const response = await api.put(RECEBIMENTO.UPDATE.replace(':id', id), data);
+        return response.data;
+    },
+
+    // Excluir recebimento e reabrir comandas vinculadas (somente grupo 1)
+    delete: async (id) => {
+        await api.delete(RECEBIMENTO.DELETE.replace(':id', id));
+        return { success: true };
+    },
 };
 
 export default recebimentoService;

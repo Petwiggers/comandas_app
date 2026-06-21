@@ -1,5 +1,5 @@
 import { AppBar, Toolbar, Typography, Button, Box, IconButton, Tooltip, Avatar, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import { Dashboard, People, Group, RestaurantMenu, Receipt, PointOfSale, Logout, AccountCircle, Menu as MenuIcon } from '@mui/icons-material';
+import { Dashboard, People, Group, RestaurantMenu, Receipt, PointOfSale, Payments, Logout, AccountCircle, Menu as MenuIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import { useState } from 'react';
@@ -33,7 +33,8 @@ const Navbar = () => {
         { label: 'Clientes', icon: <Group />, path: '/clientes' },
         { label: 'Produtos', icon: <RestaurantMenu />, path: '/produtos' },
         { label: 'Comandas', icon: <Receipt />, path: '/comandas' },
-        { label: 'Caixa', icon: <PointOfSale />, path: '/caixa' }
+        { label: 'Caixa', icon: <PointOfSale />, path: '/caixa' },
+        { label: 'Recebimentos', icon: <Payments />, path: '/recebimentos' }
     ];
     const handleDrawerToggle = () => {
         setMobileDrawerOpen(!mobileDrawerOpen);
@@ -83,12 +84,6 @@ const Navbar = () => {
                         }}
                     >
                         <RestaurantMenu sx={{ color: '#f59e0b', fontSize: { xs: '1.5rem', sm: '2rem' } }} />
-                        <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                            Comandas do Zé
-                        </Box>
-                        <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
-                            Zé
-                        </Box>
                     </Typography>
                 </Box>
                 {isAuthenticated && (
@@ -101,12 +96,12 @@ const Navbar = () => {
                                         color="inherit"
                                         onClick={() => navigate(item.path)}
                                         sx={{
-                                            minWidth: 'auto', px: 1.5, py: 1, borderRadius: 2, alignItems: 'center', gap: 0.5,
+                                            minWidth: 'auto', px: { sm: 1, md: 1.5 }, py: 1, borderRadius: 2, alignItems: 'center', gap: 0.5,
                                             '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
                                         }}
                                     >
                                         {item.icon}
-                                        <Typography variant="body2" sx={{ ml: 0.5 }}>{item.label}</Typography>
+                                        <Typography variant="body2" sx={{ ml: 0.5, display: { sm: 'none', md: 'inline' } }}>{item.label}</Typography>
                                     </Button>
                                 </Tooltip>
                             ))}
